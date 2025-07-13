@@ -36,10 +36,13 @@
     if (result.IsSuggest())
       _suggestion = @(result.GetSuggestionString().c_str());
 
-    auto const & pivot = result.GetFeatureCenter();
-    _point = CGPointMake(pivot.x, pivot.y);
-    auto const location = mercator::ToLatLon(pivot);
-    _coordinate = CLLocationCoordinate2DMake(location.m_lat, location.m_lon);
+    if (result.HasPoint())
+    {
+      auto const & pivot = result.GetFeatureCenter();
+      _point = CGPointMake(pivot.x, pivot.y);
+      auto const location = mercator::ToLatLon(pivot);
+      _coordinate = CLLocationCoordinate2DMake(location.m_lat, location.m_lon);
+    }
 
     CLLocation * lastLocation = [MWMLocationManager lastLocation];
     if (lastLocation && result.HasPoint()) {
