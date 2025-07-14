@@ -16,30 +16,54 @@ namespace geojson
 // Data structures
 
 struct GeoJsonGeometry {
+  std::string m_type;
   std::vector<geometry::PointWithAltitude> m_coordinates;
 
   template <typename Visitor>
   void Visit(Visitor & visitor)
   {
-    try {
+    visitor(m_type, "type");
+    if (m_type == "Point"){
       std::vector<double> coordData;
       visitor(coordData, "coordinates");
       if(coordData.size() != 2) {
         //ERROR!
       }
+      m_coordinates.resize(1);
+      m_coordinates.at(0) = geometry::PointWithAltitude( m2::PointD(coordData[0], coordData[1]));
     }
-    catch(RootException exc) {
-      std::vector<std::pair<double, double>> polygonData;
+
+    else if (m_type == "LineString") {
+      std::vector<std::vector<double>> polygonData;
       visitor(polygonData, "coordinates");
+      // Copy coordinates
+      m_coordinates.resize(polygonData.size());
+      for(size_t i=0; i<polygonData.size(); i++) {
+        auto pairCoords = polygonData[i];
+        m_coordinates.at(i) = geometry::PointWithAltitude( m2::PointD(pairCoords[0], pairCoords[1]));
+      }
+    }
+    else {
+      throw RootException("Unknown GeoJson geometry type", m_type);
     }
   }
 
   template <typename Visitor>
   void Visit(Visitor & visitor) const
   {
-    std::vector<double> coordData;
-    visitor(coordData, "coordinates");
-    // TODO
+    visitor(m_type, "type");
+    if (m_type == "Point"){
+      std::vector<double> coordData;
+      visitor(coordData, "coordinates");
+      if(coordData.size() != 2) {
+          //ERROR!
+      }
+    }
+
+    else if (m_type == "LineString") {
+      std::vector<std::pair<double, double>> polygonData;
+      visitor(polygonData, "coordinates");
+    }
   }
 
   friend std::string DebugPrint(GeoJsonGeometry const & c)
