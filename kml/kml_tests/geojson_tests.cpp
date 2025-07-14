@@ -54,7 +54,6 @@ UNIT_TEST(GeoJson_Parse_Basic)
     },
     {
       "type": "Feature",
-      "properties": {},
       "geometry": {
         "coordinates": [
           31.02177966625902,

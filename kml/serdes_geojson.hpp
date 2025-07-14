@@ -79,7 +79,7 @@ struct GeoJsonFeature
   DECLARE_VISITOR_AND_DEBUG_PRINT(GeoJsonFeature,
                                   visitor(m_type, "type"),
                                   visitor(m_geometry, "geometry"),
-                                  visitor(m_properties, "properties"))
+                                  visitor(m_properties, std::map<std::string, std::string>(), "properties"))
 
   bool operator==(GeoJsonFeature const & data) const
   {
