@@ -1395,4 +1395,5 @@
     <string name="type.piste_type.nordic">Διαδρομή σκανδιναβικού σκι</string>
     <string name="type.piste_type.sled">Πίστα για έλκηθρο</string>
     <string name="type.piste_type.sled.area">Πίστα για έλκηθρο</string>
+    <string name="type.amenity.bicycle_parking.covered">Σκεπαστή στάθμευση ποδηλάτων</string>
 </resources>

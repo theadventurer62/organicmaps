@@ -1493,3 +1493,4 @@
 "type.landuse.plant_nursery" = "Φυτώριο";
 "type.leisure.firepit" = "Εστία φωτιάς";
 "type.railway.station.subway.qingdao" = "Σταθμός Μετρό";
+"type.amenity.bicycle_parking.covered" = "Σκεπαστή στάθμευση ποδηλάτων";

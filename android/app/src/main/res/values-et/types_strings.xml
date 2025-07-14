@@ -1403,4 +1403,5 @@
     <string name="type.sport.diving">Sukeldumine</string>
     <string name="type.man_made.crane">Kraana</string>
     <string name="type.railway.station.subway.qingdao">Metroojaam</string>
+    <string name="type.amenity.bicycle_parking.covered">Kaetud rattaparkla</string>
 </resources>
