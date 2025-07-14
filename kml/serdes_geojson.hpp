@@ -141,7 +141,7 @@ public:
     coding::DeserializerJson des(source);
     des(geoJsonData);
 
-    // Copy bookmarks from parsed 'geoJsonData' into m_fileData.
+    // Copy bookmarks from parsed geoJsonData into m_fileData.
     for(auto feature : geoJsonData.m_features) {
         if (feature.isPoint())
         {
@@ -157,7 +157,7 @@ public:
         }
     }
 
-    // Copy tracks from parsed 'geoJsonData' into m_fileData.
+    // Copy tracks from parsed geoJsonData into m_fileData.
     for(auto feature : geoJsonData.m_features) {
         if (feature.isLine())
         {
