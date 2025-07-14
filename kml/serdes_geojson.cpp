@@ -16,12 +16,22 @@ namespace kml
 namespace geojson
 {
 
+
 void GeojsonWriter::Write(FileData const & fileData)
 {
   GeoJsonData data;
   coding::SerializerJson<Writer> ser(m_writer);
   ser(data);
 }
+
+bool GeoJsonFeature::isPoint() {
+    return this->m_geometry.m_type == "Point";
+}
+
+bool GeoJsonFeature::isLine() {
+    return this->m_geometry.m_type == "LineString";
+}
+
 
 /*template <typename ReaderType>
 void GeojsonParser::Parse(ReaderType const & reader)

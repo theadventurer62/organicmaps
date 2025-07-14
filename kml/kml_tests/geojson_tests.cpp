@@ -1,16 +1,7 @@
 #include "testing/testing.hpp"
 
-#include "kml/serdes_common.hpp"
 #include "kml/serdes_geojson.hpp"
-
-#include "geometry/mercator.hpp"
-
 #include "coding/file_reader.hpp"
-
-#include "platform/platform.hpp"
-#include "coding/serdes_json.hpp"
-
-#include "base/exception.hpp"
 
 namespace geojson_tests
 {
@@ -33,7 +24,9 @@ UNIT_TEST(GeoJson_Parse_Basic)
   "features": [
     {
       "type": "Feature",
-      "properties": {},
+      "properties": {
+        "color": "red"
+      },
       "geometry": {
         "coordinates": [
           [
@@ -67,7 +60,8 @@ UNIT_TEST(GeoJson_Parse_Basic)
 
   kml::FileData const dataFromText = LoadGeojsonFromString(input);
 
-  //TEST_EQUAL(dataFromText, data, ());
+  TEST_EQUAL(dataFromText.m_bookmarksData.size(), 1, ());
+  TEST_EQUAL(dataFromText.m_tracksData.size(), 1, ());
 }
 
-}  // namespace gpx_tests
+}  // namespace geojson_tests

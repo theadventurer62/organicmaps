@@ -17,7 +17,7 @@ namespace geojson
 
 struct GeoJsonGeometry {
   std::string m_type;
-  std::vector<geometry::PointWithAltitude> m_coordinates;
+  std::vector<m2::PointD> m_coordinates;
 
   template <typename Visitor>
   void Visit(Visitor & visitor)
@@ -30,7 +30,7 @@ struct GeoJsonGeometry {
         //ERROR!
       }
       m_coordinates.resize(1);
-      m_coordinates.at(0) = geometry::PointWithAltitude( m2::PointD(coordData[0], coordData[1]));
+      m_coordinates.at(0) = m2::PointD(coordData[0], coordData[1]);
     }
 
     else if (m_type == "LineString") {
@@ -40,7 +40,7 @@ struct GeoJsonGeometry {
       m_coordinates.resize(polygonData.size());
       for(size_t i=0; i<polygonData.size(); i++) {
         auto pairCoords = polygonData[i];
-        m_coordinates.at(i) = geometry::PointWithAltitude( m2::PointD(pairCoords[0], pairCoords[1]));
+        m_coordinates.at(i) = m2::PointD(pairCoords[0], pairCoords[1]);
       }
     }
     else {
@@ -51,19 +51,7 @@ struct GeoJsonGeometry {
   template <typename Visitor>
   void Visit(Visitor & visitor) const
   {
-    visitor(m_type, "type");
-    if (m_type == "Point"){
-      std::vector<double> coordData;
-      visitor(coordData, "coordinates");
-      if(coordData.size() != 2) {
-          //ERROR!
-      }
-    }
-
-    else if (m_type == "LineString") {
-      std::vector<std::pair<double, double>> polygonData;
-      visitor(polygonData, "coordinates");
-    }
+    // TODO!
   }
 
   friend std::string DebugPrint(GeoJsonGeometry const & c)
@@ -94,6 +82,12 @@ struct GeoJsonFeature
   std::string m_type = "Feature";
   GeoJsonGeometry m_geometry;
   std::map<std::string, std::string> m_properties;
+
+  // Returns 'true' if there's geometry with type==Point.
+  bool isPoint();
+
+  // Returns 'true' if there's geometry with type==LineString.
+  bool isLine();
 };
 
 
@@ -142,16 +136,42 @@ public:
   template <typename ReaderType>
   void Parse(ReaderType const & reader)
   {
-    geojson::GeoJsonData data;
+    geojson::GeoJsonData geoJsonData;
     NonOwningReaderSource source(reader);
     coding::DeserializerJson des(source);
-    des(data);
+    des(geoJsonData);
 
-    // Copy bookmarks from parsed 'data' into m_fileData.
-    //TODO
+    // Copy bookmarks from parsed 'geoJsonData' into m_fileData.
+    for(auto feature : geoJsonData.m_features) {
+        if (feature.isPoint())
+        {
+            auto const point = feature.m_geometry.m_coordinates[0];
+            BookmarkData bookmark;
+            if (feature.m_properties.contains("name")) {
+                auto name = kml::LocalizableString();
+                kml::SetDefaultStr(name, feature.m_properties["name"]);
+                bookmark.m_name = name;
+            }
+            bookmark.m_point = point;
+            m_fileData.m_bookmarksData.push_back(bookmark);
+        }
+    }
 
-    // Copy tracks from parsed 'data' into m_fileData.
-    //TODO
+    // Copy tracks from parsed 'geoJsonData' into m_fileData.
+    for(auto feature : geoJsonData.m_features) {
+        if (feature.isLine())
+        {
+            auto const points = feature.m_geometry.m_coordinates;
+            TrackData track;
+            if (feature.m_properties.contains("name")) {
+                auto name = kml::LocalizableString();
+                kml::SetDefaultStr(name, feature.m_properties["name"]);
+                track.m_name = name;
+            }
+            track.m_geometry.AddLine(points);
+            m_fileData.m_tracksData.push_back(track);
+        }
+    }
   }
 
 private:
@@ -159,32 +179,5 @@ private:
 };
 
 }  // namespace geojson
-
-
-/*class DeserializerGeojson
-{
-public:
-  DECLARE_EXCEPTION(DeserializeException, RootException);
-
-  explicit DeserializerGeojson(FileData & fileData);
-
-  template <typename ReaderType>
-  void Deserialize(ReaderType const & reader)
-  {
-    //NonOwningReaderSource src(reader);
-
-    //geojson::GeojsonParser parser(m_fileData);
-
-    geojson::GeoJsonData data;
-    NonOwningReaderSource source(reader);
-    coding::DeserializerJson des(source);
-    des(data);
-
-    //MYTHROW(DeserializeException, ("Could not parse GPX."));
-  }
-
-private:
-  FileData & m_fileData;
-};*/
 
 }  // namespace kml
